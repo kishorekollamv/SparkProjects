@@ -219,6 +219,6 @@ total_siverity varint,
 customer_frustration_level text);
 
 */
-writeToCassandra(frustrateddf,"customer_frustration_level","retail")
+//writeToCassandra(frustrateddf,"customer_frustration_level","retail")
 
 }}
