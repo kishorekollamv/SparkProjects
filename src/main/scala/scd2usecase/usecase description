@@ -1,0 +1,50 @@
+Please find Hive usecase to implement SCD Type 2 using Spark HQL.
+
+What are Slowly Changing Dimensions?
+	
+Slowly Changing Dimensions (SCD) - dimensions that change slowly over time, rather than changing on regular schedule, time-base. In Data Warehouse there is a need to track changes in dimension attributes in order to report historical data. In other words, implementing one of the SCD types should enable users assigning proper dimension's attribute value for given date. 
+
+There are three types of mostly used dimension in data warehousing domain such as SCD1, SCD2, SCD3 . They are also called TYPE1, TYPE2, TYPE3 dimensions.
+
+Type1: It never maintains history in the target table. It keeps the most recent updated record in the data base.
+
+Type2: It maintains full history in the target. It maintains history by inserting the new record for each change.
+
+Type3: It keeps the both current and previous values in the target.
+
+Let us implement Type2 Dimension(SCD2) in Hive using Spark HQL with below info:-
+
+Table:tbl_main
+
+empid,name,employer,effectivedt,city
+1,Victor,CyberTron,2014-02-18,Chicago
+2,Natalie,CyberTron,2014-01-01,NewYork
+3,Nathan,CyberTron,2014-01-01,NewYork
+4,Sam,Acme,2011-01-01,Boston
+4,Sam,Acme,2014-06-01,Atlanta
+
+Table:tbl_change
+
+empid,empname,employer,effectivedt,city 
+1,Victor,Acme,2014-06-09,Chicago
+2,Natalie,Acme,2014-06-01,NewYork
+3,Nathan,Acme,2014-06-01,NewYork
+6,Hammond,Acme,2014-07-01,NewYork
+
+
+From these 2 tables, the output result is in SCD Type#2 format should be loaded into the below table:
+
+Table:tbl_target
+
+id,empid,empname,employer,city,effectivedt,enddt
+1,4,Sam,Acme,Boston,2011-01-01,2014-06-01
+2,4,Sam,Acme,Atlanta,2014-06-01,null
+3,1,Victor,CyberTron,Chicago,2014-02-18,2014-06-09
+4,1,Victor,Acme,Chicago,2014-06-09,null
+5,2,Natalie,CyberTron,NewYork 2014-01-01,2014-06-01
+6,2,Natalie,Acme,NewYork,2014-06-01,null
+7,6,Hammond,Acme,NewYork 2014-07-01,null
+8,3,Nathan,CyberTron,NewYork 2014-01-01,2014-06-01
+9,3,Nathan,Acme,NewYork,2014-06-01,2014-06-01
+
+this is real time use-case, please do this exercise and let me know if any issues.

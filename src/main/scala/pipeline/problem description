@@ -1,0 +1,500 @@
+I have a interview question and they asked to create pipeline
+The metrics expected out of it would be the sales value by different vendors, products and also customers in a given time frame. Please come up with the solution for loading these data into the data lake and give a sample hive table design with the recommended partitions.
+
+Question: Sales Pipeline design
+
+ 
+
+We have to populate a data lake which will be Hive and use Pyspark/ Scala as the processing layer. The data lake is about the sales information from various sales websites (Amazon, flipKart etc) . We need to curate  and store the data for our sales analytics.  Different websites will send details of sales in different formats 
+
+ eg: Vendor1 sends us details in 3 different json files in regular intervals (eg. Hourly)  file naming convention is vendor1_customer_timestamp.json, vendor1_product_timestamp.json,vendor1_sales_timestamp.json
+
+ 
+
+vendor1_customer_timestamp.json, 
+
+vendor1_product_timestamp.json, 
+
+vendor1_sales_timestamp.json 
+
+ 
+
+Customer 
+
+ 
+
+[{
+
+ 
+
+"Customer_id": "CUST001"
+
+ 
+
+"Customer_name": "Danny"
+
+ 
+
+"email_address":"danny123@amail.com"
+
+ 
+
+},
+
+{
+
+ 
+
+"Customer_id": "CUST002"
+
+ 
+
+"Customer_name": "Abbas"
+
+ 
+
+"email_address":"abbas_ab@amail.com"
+
+ 
+
+},
+
+{
+
+ 
+
+"Customer_id": "CUST003"
+
+ 
+
+"Customer_name": "joey"
+
+ 
+
+"email_address":"joey_ch@amail.com"
+
+ 
+
+}
+
+ 
+
+]
+
+Product
+
+ 
+
+[{
+
+ 
+
+"product_id":"Prod001"
+
+ 
+
+"product_name":"Pk_Zoom"
+
+ 
+
+"product_Category":"footwear"
+
+ 
+
+},
+
+{
+
+ 
+
+"product_id":"Prod002"
+
+ 
+
+"product_name":"Pk_air"
+
+ 
+
+"product_Category":"footwear"
+
+ 
+
+},
+
+{
+
+ 
+
+"product_id":"Prod003"
+
+ 
+
+"product_name":"FS_Neo"
+
+ 
+
+"product_Category":"watches"
+
+ 
+
+},
+
+{
+
+ 
+
+"product_id":"Prod004"
+
+ 
+
+"product_name":"FS_Smart"
+
+ 
+
+"product_Category":"watxhes"
+
+ 
+
+},
+
+{
+
+ 
+
+"product_id":"Prod005"
+
+ 
+
+"product_name":"NK_Cool"
+
+ 
+
+"product_Category":"sunglases"
+
+ 
+
+}
+
+ 
+
+]
+
+Sales
+
+ 
+
+[
+
+ 
+
+{
+
+ 
+
+"customer_id": "CUST0002"
+
+ 
+
+"line":{"product_id":"Prod002"
+
+ 
+
+"purchase_time":"2020-09-10 15:08:10"
+
+ 
+
+"quantity":"1"
+
+ 
+
+"unit_price":"450$"
+
+ 
+
+}
+
+ 
+
+"shipping_address":"Xavier's Street colombo"
+
+ 
+
+},
+
+{
+
+ 
+
+"customer_id": "CUST0001"
+
+ 
+
+"line":{"product_id":"Prod003"
+
+ 
+
+"purchase_time":"2020-09-10 15:14:12"
+
+ 
+
+"quantity":"1"
+
+ 
+
+"unit_price":"500$"
+
+ 
+
+}
+
+ 
+
+"shipping_address":"castle berry georgia"
+
+ 
+
+},
+
+{
+
+ 
+
+"customer_id": "CUST0002"
+
+ 
+
+"line":{"product_id":"Prod005"
+
+ 
+
+"purchase_time":"2020-09-10 15:23:16"
+
+ 
+
+"quantity":"1"
+
+ 
+
+"unit_price":"100$"
+
+ 
+
+}
+
+ 
+
+"shipping_address":"Xavier's Street colombo"
+
+ 
+
+},
+
+ 
+
+]
+
+ 
+
+ 
+
+Vendor 2 send us the details on the same hourly basis but in one single json file and the naming convention is vendor2_sales_timestamp.json
+
+ 
+
+vendor2_sales_timestamp.json 
+
+ 
+
+ 
+
+[
+
+ 
+
+{"customer_id":"CUST0004"
+
+ 
+
+  "customer_name":"sylon"
+
+ 
+
+  "email_address": "sylon@amail.com"
+
+ 
+
+   "shipping address": "st.thomas 5th cross los angels"
+
+ 
+
+  "line":{"product_id":"Prod010"
+
+ 
+
+           "product_name":"Nk_air"
+
+ 
+
+           "product_Category":"footwear"
+
+ 
+
+                "purchase_time" :"2020-07-29 09:03:56"
+
+ 
+
+                "qty":"1"
+
+ 
+
+                "unit_price":"400$"
+
+ 
+
+              }
+
+ 
+
+},
+
+{"customer_id":"CUST0012"
+
+ 
+
+  "customer_name":"Carlos"
+
+ 
+
+  "email_address": "carlos_102@amil.com"
+
+ 
+
+   "shipping address": "dutch street fremount"
+
+ 
+
+  "line":{"product_id":"PROD0002"
+
+ 
+
+           "product_name":"NK_Fire"
+
+ 
+
+           "product_Category":"sunglasses"
+
+ 
+
+                "purchase_time" :"2020-07-29 09:12:33"
+
+ 
+
+                "qty":"1"
+
+ 
+
+                "unit_price":"300$"
+
+ 
+
+              }
+
+ 
+
+},
+
+{"customer_id":"CUST005"
+
+ 
+
+  "customer_name":"lal singh"
+
+ 
+
+  "email_address": "lal_singh@amail.com"
+
+ 
+
+   "shipping address": "MG road ohio"
+
+ 
+
+  "line":{"product_id":"PROD0010"
+
+ 
+
+           "product_name":"NK_air"
+
+ 
+
+           "product_Category":"footwear"
+
+ 
+
+                "purchase_time" :"2020-07-29 09:12:33"
+
+ 
+
+                "qty":"2"
+
+ 
+
+                "unit_price":"800$"
+
+ 
+
+              }
+
+ 
+
+},
+
+{"customer_id":"CUST0014"
+
+ 
+
+  "customer_name":"taylor"
+
+ 
+
+  "email_address": "taylor_398@amil.com"
+
+ 
+
+   "shipping address": "MG Road ohio"
+
+ 
+
+  "line":{"product_id":"PROD003"
+
+ 
+
+           "product_name":"FS_smart"
+
+ 
+
+           "product_Category":"watches"
+
+ 
+
+                "purchase_time" :"2020-07-29 09:12:33"
+
+ 
+
+                "qty":"1"
+
+ 
+
+                "unit_price":"700$"
+
+ 
+
+              }
+
+ 
+
+},
+
+ 
+
+]
