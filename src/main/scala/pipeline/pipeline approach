@@ -1,0 +1,31 @@
+1. The following options to get the given JSON data files
+a. Push the data file to the shared drive in the edge node by the client
+b. Pull the required files from the client location using FTP in a scheduled manner to the local folder in the edge node
+c. Move the files to the folder "Source Data" (Empty the initial file location and this can be helpful to check the condition in shell script before moving the file and keep a copy for reference) as well as HDFS Hive warehouse location using shell script and call the action in Oozie scheduler. In case if there is a duplicate record then you need to follow point 3 first and move only sales data
+
+2. Create Hive tables for Customer, Product, and Sales using JSON serde handler (Ensure the respective jar file to be added into the hive bin folder) 
+
+3. Assume the Customer and Product file has always had only for the newly added Customer or Newly added Product. If not, the following steps to be followed to filter the new customer and product and insert into hive customer and product tables respectively 
+a. Load the newly received JSON file data and the existing Customer data from Hive table into SparkSql Program.
+b. Create two different data frames and load the data, create a view for both and using SQL subquery and find out "Not In" data and insert back into customer Hive table. The same has to be done for the Product as well. 
+c. Build a jar with dependencies to run the same using Spark Submit command in shell script and the same can be used in Oozie Scheduler
+4. Load customer, product, and sales data to SparkSql, create a view, join and run necessary aggregation details store into MySQL database to connect to the further web application dashboard. 
+
+In case if the details should be shared in parallel with multiple targets then data can be pushed into a specific Kafka producer topic.
+
+Or from Spark, it can be sent to ES and view the data into Kibana dashboard,
+
+As mentioned earlier, we need to Build a jar with dependencies to run the same using Spark Submit command in the shell script and the same can be used in Oozie Scheduler
+
+So the pipeline in Oozie should be 
+Shell script to Move Sales data into Hive table ===> Shell Script to run Spark Submit command to identify and insert new customer and product data into Hive table ===> Shell script to run Spark Submit command to add data in MySql or Kafka or in ES
+
+We can build a pipeline using nifi. The following process can be used (Since the data is flowing once in an hour, this could be a  costly process) 
+Getfile -> read the file from the local file system for customer, Product, and sales data into flow-file
+SplitJSON -> Since it is JSON data, it can be split based on $.<repeated node>
+EvaluateJSON -> Validate the data 
+Attributeflowfile or Updateflowfile -> Create the attributes and add all the respective values to the attributes
+PutSQL -> Add into MySql by creating the insert script for the required column using the required attributes for further analysis, because we cannot use nifi to analyze data
+or 
+AttributeToJSON - Construct a required JON file using attributes
+InvokeHTTP -> push the data into the predefined index in ES and run the further query/transformation in ES and Analyse in Kibana
